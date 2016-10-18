@@ -1,4 +1,4 @@
-package com.eventtus.twitterapp;
+package com.eventtus.twitterapp.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.twitter.sdk.android.core.models.User;

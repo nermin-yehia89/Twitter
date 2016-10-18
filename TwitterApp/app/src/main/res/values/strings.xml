@@ -2,4 +2,12 @@
     <string name="app_name">TwitterApp</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="preference_file_key">UserData</string>
+    <string name="no_followers">No Followers... </string>
+    <string name="followers_error">Error Occured While Loading Followers... </string>
+    <string name="followers">Followers List</string>
+    <string name="follower_details">Follower Details</string>
+    <string name="authentication_failed">Authentication Failed</string>
+    <string name="authenticated_successfully">Authenticated Successfully</string>
+
+
 </resources>

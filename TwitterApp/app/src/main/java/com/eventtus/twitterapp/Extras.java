@@ -6,4 +6,6 @@ package com.eventtus.twitterapp;
 
 public class Extras {
     public static final String TWITTER_USER_ID = "com.eventtus.twitterapp.TwitterUserID";
+    public static final String FOLLWER = "com.eventtus.twitterapp.Follower";
+
 }
