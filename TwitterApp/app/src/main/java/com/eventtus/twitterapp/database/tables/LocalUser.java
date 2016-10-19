@@ -16,16 +16,27 @@ public class LocalUser implements Serializable{
     public static final String SCREEN_NAME = "screen_name";
     public static final String DESCRIPTION = "description";
     public static final String PROFILE_IMAGE_URL = "profileImageUrl";
+    public static final String PROFILE_BG_IMAGE_URL = "profileBGImageUrl";
+
     public LocalUser(){
 
     }
 
-    public LocalUser(String name,String screenName,String description,String imageUrl,long userId) {
+    public LocalUser(String name,String screenName,String description,String imageUrl,String bGImageUrl,long userId) {
        this.userId = userId;
         this.description = description;
         this.name = name;
         this.profileImageUrl = imageUrl;
         this.screenName = screenName;
+        this.profileBGImageUrl = bGImageUrl;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     /** The id. */
@@ -76,5 +87,14 @@ public class LocalUser implements Serializable{
     @DatabaseField(columnName = PROFILE_IMAGE_URL)
     String profileImageUrl;
 
+    public String getProfileBGImageUrl() {
+        return profileBGImageUrl;
+    }
 
+    public void setProfileBGImageUrl(String profileBGImageUrl) {
+        this.profileBGImageUrl = profileBGImageUrl;
+    }
+
+    @DatabaseField(columnName = PROFILE_BG_IMAGE_URL)
+    String profileBGImageUrl;
 }

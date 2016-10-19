@@ -1,67 +1,166 @@
 package com.eventtus.twitterapp.services;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
+import com.eventtus.twitterapp.Extras;
+import com.eventtus.twitterapp.MyTwitterApiClient;
+import com.eventtus.twitterapp.R;
+import com.eventtus.twitterapp.TwitterAppUtils;
 import com.eventtus.twitterapp.dataaccess.LocalModel;
+import com.eventtus.twitterapp.database.tables.LocalUser;
+import com.eventtus.twitterapp.models.Followers;
 import com.eventtus.twitterapp.models.LocalUsers;
+import com.eventtus.twitterapp.models.Tweets;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.models.Tweet;
+
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
  */
 public class TwitterIntentService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
+    private static final String TAG = TwitterIntentService.class.getName();
+
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String SAVE_USERS = "com.eventtus.twitterapp.services.action.saveUsers";
+    public static final String SAVE_USERS = "com.eventtus.twitterapp.services.action.saveUsers";
+    public static final String GET_TWEETS = "com.eventtus.twitterapp.services.action.getTweets";
+    public static final String GOT_TWEETS = "com.eventtus.twitterapp.services.action.gotTweets";
+    public static final String GET_FOLLOWERS = "com.eventtus.twitterapp.services.action.getFollowers";
+    public static final String GOT_FOLLOWERS = "com.eventtus.twitterapp.services.action.gotFollowers";
+
 
     // Intent keys for this service
     public static final class Intents {
-        public static final String USERS = "com.gi.c2do.action.Users";
+        public static final String SCREEN_NAME = "com.gi.c2do.action.ScreenName";
+        public static final String USER_ID = "com.gi.c2do.action.UserID";
+        public static final String SHOW_ERROR_DIALOG = "com.gi.c2do.action.ShowError";
 
 
-
-}
+    }
         public TwitterIntentService() {
         super("TwitterIntentService");
     }
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
+    /***
+     * start service to request followers
+     * @param context
+     * @param userId
      */
-    public static void startActionSaveUsers(Context context, LocalUsers users) {
+    public static void startGetFollwersService(Context context, long userId) {
         Intent intent = new Intent(context, TwitterIntentService.class);
-        intent.setAction(SAVE_USERS);
-        intent.putExtra(Intents.USERS, users);
+        intent.setAction(GET_FOLLOWERS);
+        intent.putExtra(Intents.USER_ID, userId);
         context.startService(intent);
     }
+
+    /***
+     * start service to get user tweets
+     * @param context
+     * @param screenName
+     */
+    public static void startGetTweets(Context context, String screenName) {
+        Intent intent = new Intent(context, TwitterIntentService.class);
+        intent.setAction(GET_TWEETS);
+        intent.putExtra(Intents.SCREEN_NAME, screenName);
+        context.startService(intent);
+    }
+
+
 
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (SAVE_USERS.equals(action)) {
-                final LocalUsers users = (LocalUsers)intent.getSerializableExtra(Intents.USERS);
-                saveTweets(users);
+
+            if (GET_FOLLOWERS.equals(action)) {
+                final long userID = intent.getLongExtra(Intents.USER_ID, 0);
+
+                TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
+                retrofit2.Call<Followers> call = new MyTwitterApiClient(twitterSession).getCustomService().listFollowers(userID);
+
+                call.enqueue(new Callback<Followers>() {
+                    @Override
+                    public void success(Result<Followers> result) {
+                        List<LocalUser> users = TwitterAppUtils.assembleFollowers(result.data.users);
+                        LocalUsers localUsers = new LocalUsers(users);
+                        saveFollwers(localUsers);
+
+                        // send broad cast to screen with data
+                        Intent broadcastReceiver = new Intent(GOT_FOLLOWERS);
+                        broadcastReceiver.putExtra(Extras.USERS, localUsers);
+                        sendBroadcast(broadcastReceiver);
+
+
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+                        sendErrorBroadcast(getResources().getString(R.string.followers_error) + ": " + exception.getMessage());
+
+
+                    }
+                });
+
+            } else if (GET_TWEETS.equals(action)) {
+                final String screenName = intent.getStringExtra(Intents.SCREEN_NAME);
+
+                TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
+                retrofit2.Call<List<Tweet>> call = new MyTwitterApiClient(twitterSession).getCustomService().listTweets(screenName, 10);
+
+                call.enqueue(new Callback<List<Tweet>>() {
+                    @Override
+                    public void success(Result<List<Tweet>> result) {
+                        List<com.eventtus.twitterapp.models.Tweet> tweets = TwitterAppUtils.assembleTweets(result.data);
+                        Tweets allTweets = new Tweets(tweets);
+
+                        // send broad cast to screen with data
+                        Intent broadcastReceiver = new Intent(GOT_TWEETS);
+                        broadcastReceiver.putExtra(Extras.TWEETS, allTweets);
+                        sendBroadcast(broadcastReceiver);
+
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+                        exception.printStackTrace();
+
+                        sendErrorBroadcast(getResources().getString(R.string.load_tweets_failed) + ": " + exception.getMessage());
+
+                    }
+                });
             }
+
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
+
+    /***
+     * save followers in database
+     * @param users
      */
-    private void saveTweets(LocalUsers users) {
+
+    private void saveFollwers(LocalUsers users) {
         LocalModel.getInstance(getBaseContext()).insertTwitterUsers(users.users);
 
+    }
+
+    /***
+     * send broad cast to notify screen with error
+     * @param msg
+     */
+    private void sendErrorBroadcast(String msg){
+        Intent broadcastReceiver = new Intent(Intents.SHOW_ERROR_DIALOG);
+        broadcastReceiver.putExtra(Extras.ERROR_MESSAGE, msg);
+        sendBroadcast(broadcastReceiver);
     }
 
 

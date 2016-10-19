@@ -13,8 +13,8 @@ import io.fabric.sdk.android.Fabric;
 
 public class TwitterApp extends Application{
 
-    private static final String TWITTER_KEY = "c0s5htY23m4NUnTOxEmiwJcMT";
-    private static final String TWITTER_SECRET = "rKbIOeXn5fwWfJ62w3okYzDZVlsYwvk6WnnaR93BwSfa1ZsZs2";
+    private static final String TWITTER_KEY = "VCaDQb5qKAfqPVRHbTfzQmgyf";
+    private static final String TWITTER_SECRET = "EOhRKp7MnJGtsgYHg484FmIZVdTb4a78rg77d2bHHFrd1S9veu";
     @Override
     public void onCreate() {
         super.onCreate();

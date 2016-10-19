@@ -7,12 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.eventtus.twitterapp.R;
-import com.eventtus.twitterapp.database.tables.LocalUser;
+import com.eventtus.twitterapp.models.Tweet;
 
 import java.util.List;
 
@@ -23,20 +21,18 @@ import java.util.List;
  * @author nermin.yehia
  * 
  */
-public class FollowersAdapter extends BaseAdapter {
+public class TweetsAdapter extends BaseAdapter {
 
 	private Activity context;
-	private List<LocalUser> data;
+	private List<Tweet> data;
 	private SparseBooleanArray mSelectedItemsIds;
 
 	private class ViewHolder {
-		TextView handle;
-		TextView bio;
-		TextView name;
-		ImageView icon;
+		TextView createaAt;
+		TextView text;
 	}
 
-	public FollowersAdapter(Context context, List<LocalUser> objects) {
+	public TweetsAdapter(Context context, List<Tweet> objects) {
 		this.data = objects;
 		this.context = (Activity) context;
 		mSelectedItemsIds = new SparseBooleanArray();
@@ -52,34 +48,22 @@ public class FollowersAdapter extends BaseAdapter {
 		if (convertView == null) {
 			LayoutInflater vi = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = vi.inflate(R.layout.follower_row, null);
+			convertView = vi.inflate(R.layout.tweetr_row, null);
 			holder = new ViewHolder();
-			holder.handle = (TextView) convertView
-					.findViewById(R.id.handle);
-			holder.bio = (TextView) convertView
-					.findViewById(R.id.bio);
-			holder.name = (TextView) convertView
-					.findViewById(R.id.name);
-			holder.icon = (ImageView) convertView
-					.findViewById(R.id.profile_img);
+			holder.createaAt = (TextView) convertView
+					.findViewById(R.id.createdAt);
+			holder.text = (TextView) convertView
+					.findViewById(R.id.text);
 			convertView.setTag(holder);
 
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		LocalUser follower = (LocalUser) data.get(position);
+		Tweet follower = (Tweet) data.get(position);
 
-		holder.name.setText(follower.getName());
-		holder.handle.setText("@"+follower.getScreenName());
-		holder.bio.setText(follower.getDescription());
-		Glide
-				.with(context)
-				.load(follower.getProfileImageUrl())
-				.centerCrop()
-				.placeholder(R.drawable.user_profile_placeholder)
-				.crossFade()
-				.into(holder.icon);
+		holder.text.setText(follower.getText());
+		holder.createaAt.setText(follower.getCreatedAt());
 
 
 		return convertView;
