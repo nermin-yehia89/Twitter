@@ -12,6 +12,8 @@ import java.util.List;
 public class Followers {
     @SerializedName("users")
     public final List<User> users;
+    @SerializedName("next_cursor_str")
+    public String cursor;
 
     public Followers(List<User> users) {
         this.users = users;

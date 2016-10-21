@@ -30,7 +30,6 @@ public class TwitterIntentService extends IntentService {
     private static final String TAG = TwitterIntentService.class.getName();
 
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    public static final String SAVE_USERS = "com.eventtus.twitterapp.services.action.saveUsers";
     public static final String GET_TWEETS = "com.eventtus.twitterapp.services.action.getTweets";
     public static final String GOT_TWEETS = "com.eventtus.twitterapp.services.action.gotTweets";
     public static final String GET_FOLLOWERS = "com.eventtus.twitterapp.services.action.getFollowers";
@@ -42,27 +41,33 @@ public class TwitterIntentService extends IntentService {
         public static final String SCREEN_NAME = "com.gi.c2do.action.ScreenName";
         public static final String USER_ID = "com.gi.c2do.action.UserID";
         public static final String SHOW_ERROR_DIALOG = "com.gi.c2do.action.ShowError";
+        public static final String PAGE = "com.gi.c2do.action.Page";
+        public static final String CURSOR = "com.gi.c2do.action.Cursor";
 
 
     }
-        public TwitterIntentService() {
+
+    public TwitterIntentService() {
         super("TwitterIntentService");
     }
 
     /***
      * start service to request followers
+     *
      * @param context
      * @param userId
      */
-    public static void startGetFollwersService(Context context, long userId) {
+    public static void startGetFollwersService(Context context, long userId, String cursor) {
         Intent intent = new Intent(context, TwitterIntentService.class);
         intent.setAction(GET_FOLLOWERS);
         intent.putExtra(Intents.USER_ID, userId);
+        intent.putExtra(Intents.CURSOR, cursor);
         context.startService(intent);
     }
 
     /***
      * start service to get user tweets
+     *
      * @param context
      * @param screenName
      */
@@ -74,8 +79,6 @@ public class TwitterIntentService extends IntentService {
     }
 
 
-
-
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -83,33 +86,38 @@ public class TwitterIntentService extends IntentService {
 
             if (GET_FOLLOWERS.equals(action)) {
                 final long userID = intent.getLongExtra(Intents.USER_ID, 0);
+                final int page = intent.getIntExtra(Intents.PAGE, 1);
+                final String cursor = intent.getStringExtra(Intents.CURSOR);
 
-                TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
-                retrofit2.Call<Followers> call = new MyTwitterApiClient(twitterSession).getCustomService().listFollowers(userID);
+                if (!"0".equals(cursor)) {
+                    TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
+                    retrofit2.Call<Followers> call = new MyTwitterApiClient(twitterSession).getCustomService().listFollowers(userID,20,cursor);
 
-                call.enqueue(new Callback<Followers>() {
-                    @Override
-                    public void success(Result<Followers> result) {
-                        List<LocalUser> users = TwitterAppUtils.assembleFollowers(result.data.users);
-                        LocalUsers localUsers = new LocalUsers(users);
-                        saveFollwers(localUsers);
+                    call.enqueue(new Callback<Followers>() {
+                        @Override
+                        public void success(Result<Followers> result) {
+                            List<LocalUser> users = TwitterAppUtils.assembleFollowers(result.data.users);
+                            LocalUsers localUsers = new LocalUsers(users);
+                            if ("-1".equals(cursor) )
+                                saveFollwers(localUsers);
 
-                        // send broad cast to screen with data
-                        Intent broadcastReceiver = new Intent(GOT_FOLLOWERS);
-                        broadcastReceiver.putExtra(Extras.USERS, localUsers);
-                        sendBroadcast(broadcastReceiver);
+                            // send broad cast to screen with data
+                            Intent broadcastReceiver = new Intent(GOT_FOLLOWERS);
+                            broadcastReceiver.putExtra(Extras.USERS, localUsers);
+                            broadcastReceiver.putExtra(Extras.CURSOR, result.data.cursor);
+                            sendBroadcast(broadcastReceiver);
+                        }
+
+                        @Override
+                        public void failure(TwitterException exception) {
+                            exception.printStackTrace();
+
+                            sendErrorBroadcast(getResources().getString(R.string.followers_error) + ": " + exception.getMessage());
 
 
-                    }
-
-                    @Override
-                    public void failure(TwitterException exception) {
-                        sendErrorBroadcast(getResources().getString(R.string.followers_error) + ": " + exception.getMessage());
-
-
-                    }
-                });
-
+                        }
+                    });
+                }
             } else if (GET_TWEETS.equals(action)) {
                 final String screenName = intent.getStringExtra(Intents.SCREEN_NAME);
 
@@ -143,8 +151,11 @@ public class TwitterIntentService extends IntentService {
     }
 
 
+
+
     /***
      * save followers in database
+     *
      * @param users
      */
 
@@ -155,9 +166,10 @@ public class TwitterIntentService extends IntentService {
 
     /***
      * send broad cast to notify screen with error
+     *
      * @param msg
      */
-    private void sendErrorBroadcast(String msg){
+    private void sendErrorBroadcast(String msg) {
         Intent broadcastReceiver = new Intent(Intents.SHOW_ERROR_DIALOG);
         broadcastReceiver.putExtra(Extras.ERROR_MESSAGE, msg);
         sendBroadcast(broadcastReceiver);

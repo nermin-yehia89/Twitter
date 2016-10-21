@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.eventtus.twitterapp.EndlessScrollListener;
 import com.eventtus.twitterapp.Extras;
 import com.eventtus.twitterapp.R;
 import com.eventtus.twitterapp.adapters.FollowersAdapter;
@@ -43,6 +44,7 @@ public class FollowersListFragment extends BaseFragment implements
     private FollowersAdapter followersAdapter;
     private FollowersLookupTaskDB followersLookupTaskDB;
     private FollowersReceiver followersReceiver;
+    private String cursor = "-1";
 
 
     @Override
@@ -61,7 +63,17 @@ public class FollowersListFragment extends BaseFragment implements
         list.setDividerHeight(2);
         list.setOnItemClickListener(this);
         list.setEmptyView(view.findViewById(R.id.noFollowers));
-
+        list.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to your AdapterView
+                if( !"-1".equals(cursor))
+                requestCurrentUserFollowers(cursor);
+                // or customLoadMoreDataFromApi(totalItemsCount);
+                return true; // ONLY if more data is actually being loaded; false otherwise.
+            }
+        });
 
         followersAdapter = new FollowersAdapter(getActivity(), followersList);
 
@@ -85,8 +97,9 @@ public class FollowersListFragment extends BaseFragment implements
         activity.registerReceiver(followersReceiver, new IntentFilter(
                 TwitterIntentService.GOT_FOLLOWERS));
 
+        cursor = "-1";
         showProgressDialog();
-        requestCurrentUserFollowers();
+        requestCurrentUserFollowers(cursor);
         lookupFollowers();
 
 
@@ -173,10 +186,10 @@ public class FollowersListFragment extends BaseFragment implements
                 .replace(R.id.page_content, fragment).commit();
     }
 
-    private void requestCurrentUserFollowers() {
+    private void requestCurrentUserFollowers(String cursor) {
 
         TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
-        TwitterIntentService.startGetFollwersService(activity, twitterSession.getUserId());
+        TwitterIntentService.startGetFollwersService(activity, twitterSession.getUserId(),cursor);
 
 
     }
@@ -190,9 +203,14 @@ public class FollowersListFragment extends BaseFragment implements
                             + intent.getAction());
 
             LocalUsers localUsers = (LocalUsers) intent.getExtras().getSerializable(Extras.USERS);
-            followersList.clear();
+            if ("-1".equals(cursor) )
+                followersList.clear();
+            cursor = intent.getStringExtra(Extras.CURSOR);
+
+
             followersList.addAll(localUsers.users);
             followersAdapter.notifyDataSetChanged();
+
             dismissProgressDialog();
 
 

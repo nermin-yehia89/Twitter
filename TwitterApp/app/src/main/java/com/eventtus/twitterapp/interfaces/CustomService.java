@@ -15,8 +15,7 @@ import retrofit2.http.Query;
 
 public interface CustomService {
      @GET("/1.1/followers/list.json")
-     Call<Followers> listFollowers(@Query("user_id") long id);
-
+     Call<Followers> listFollowers(@Query("user_id") long id,@Query("count") int count, @Query("cursor") String cursor);
      @GET("/1.1/statuses/user_timeline.json")
      Call<List<Tweet>> listTweets(@Query("screen_name") String id ,@Query("count") Integer count);
 }

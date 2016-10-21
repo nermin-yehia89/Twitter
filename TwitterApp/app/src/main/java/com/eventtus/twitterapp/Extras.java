@@ -10,6 +10,8 @@ public class Extras {
     public static final String ERROR_MESSAGE = "com.eventtus.twitterapp.ErrorMessage";
     public static final String USERS = "com.eventtus.twitterapp.Users";
     public static final String TWEETS = "com.eventtus.twitterapp.Tweets";
+    public static final String CURSOR = "com.eventtus.twitterapp.Cursor";
+
 
 
 }

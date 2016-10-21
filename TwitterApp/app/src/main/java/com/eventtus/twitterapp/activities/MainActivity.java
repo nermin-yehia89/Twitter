@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
       super.onResume();
         String userID = TwitterAppUtils.getFromSharedPrefs(this, Extras.TWITTER_USER_ID) ;
         Log.d(TAG," User ID : " + userID);
+
+
         if(userID == null){
             // open authenticate activity
             Intent intent = new Intent(this, AuthenticateActivity.class);
