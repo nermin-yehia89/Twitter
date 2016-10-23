@@ -118,6 +118,9 @@ public class FollowerDetailsFragment extends BaseFragment  {
 
 	}
 
+	/***
+	 * call twitter api to get user tweets
+	 */
 	private void requestUserTweets(){
 		showProgressDialog();
 		TwitterIntentService.startGetTweets(activity,currentUser.getScreenName());
@@ -144,6 +147,9 @@ public class FollowerDetailsFragment extends BaseFragment  {
 	}
 
 
+	/***
+	 * tweets receiver
+	 */
 	private class TweetsReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {

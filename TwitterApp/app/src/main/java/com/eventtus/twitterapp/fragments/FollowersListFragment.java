@@ -71,8 +71,8 @@ public class FollowersListFragment extends BaseFragment implements
             public boolean onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to your AdapterView
-                if( !"-1".equals(cursor))
-                requestCurrentUserFollowers(cursor);
+                if (!"-1".equals(cursor))
+                    requestCurrentUserFollowers(cursor);
                 // or customLoadMoreDataFromApi(totalItemsCount);
                 return true; // ONLY if more data is actually being loaded; false otherwise.
             }
@@ -106,7 +106,6 @@ public class FollowersListFragment extends BaseFragment implements
         lookupFollowers();
 
 
-
     }
 
     @Override
@@ -123,7 +122,7 @@ public class FollowersListFragment extends BaseFragment implements
     }
 
     /***
-     * Executes AsyncTask for retrieving nodes
+     * Executes AsyncTask for retrieving followers
      */
     void lookupFollowers() {
         if (followersLookupTaskDB != null)
@@ -135,7 +134,7 @@ public class FollowersListFragment extends BaseFragment implements
 
 
     /***
-     * lookup rides task
+     * lookup followers from local database task
      *
      * @author nermin.yehia
      */
@@ -181,7 +180,11 @@ public class FollowersListFragment extends BaseFragment implements
 
     }
 
-
+    /***
+     * open follower details screen
+     *
+     * @param user
+     */
     private void openFollowerDetailsFragment(LocalUser user) {
         FollowerDetailsFragment fragment = FollowerDetailsFragment.createInstance(user);
         getActivity().getSupportFragmentManager().beginTransaction()
@@ -189,14 +192,22 @@ public class FollowersListFragment extends BaseFragment implements
                 .replace(R.id.page_content, fragment).commit();
     }
 
+    /***
+     * request user followers for a specific cursor
+     *
+     * @param cursor
+     */
     private void requestCurrentUserFollowers(String cursor) {
 
         TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
-        TwitterIntentService.startGetFollwersService(activity, twitterSession.getUserId(),cursor);
+        TwitterIntentService.startGetFollwersService(activity, twitterSession.getUserId(), cursor);
 
 
     }
 
+    /***
+     * followers receiver
+     */
     private class FollowersReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -206,7 +217,7 @@ public class FollowersListFragment extends BaseFragment implements
                             + intent.getAction());
 
             LocalUsers localUsers = (LocalUsers) intent.getExtras().getSerializable(Extras.USERS);
-            if ("-1".equals(cursor) )
+            if ("-1".equals(cursor))
                 followersList.clear();
             cursor = intent.getStringExtra(Extras.CURSOR);
 
@@ -221,7 +232,7 @@ public class FollowersListFragment extends BaseFragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.reload : {
+            case R.id.reload: {
                 cursor = "-1";
                 showProgressDialog();
                 requestCurrentUserFollowers(cursor);
