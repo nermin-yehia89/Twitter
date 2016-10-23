@@ -1,10 +1,10 @@
 # Twitter
 Twitter Test App
 
-this is a simple Twitter client App using\n
-1- fabric kit sdk to make twitter login and api calls.\n
-2- Ormlite to create local database to save user followers.\n
-3- Glide to load profile images.\n
+this is a simple Twitter client App using
+1- fabric kit sdk to make twitter login and api calls.
+2- Ormlite to create local database to save user followers.
+3- Glide to load profile images.
 
 Two activities
 1- Authenticate Activity: to make login process
