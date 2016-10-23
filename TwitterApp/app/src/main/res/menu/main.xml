@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.starthouse.strike.StrikeMainActivity"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/reload"
+        android:icon="@android:drawable/stat_notify_sync_noanim"
+        android:menuCategory="system"
+        android:visible="false"
+        app:showAsAction="ifRoom"
+        android:title="@string/reload"/>
+   
+
+</menu>

@@ -18,7 +18,7 @@ import java.util.List;
 
 
 /***
- * that adapter used to show Conversations list and can be used for other data
+ * that adapter used to show followers list
  * 
  * @author nermin.yehia
  * 

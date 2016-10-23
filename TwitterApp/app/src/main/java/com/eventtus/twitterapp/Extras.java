@@ -2,6 +2,7 @@ package com.eventtus.twitterapp;
 
 /**
  * Created by nermin.yehia on 10/17/2016.
+ * thst class contains constants used in the application
  */
 
 public class Extras {

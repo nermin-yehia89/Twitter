@@ -14,8 +14,7 @@ import java.util.List;
 /**
  * Local model is the main interface to the local data access layer, exposing
  * CRUD methods for domain objects, but abstracting the underlying data store
- * implementation. Additionally, any second-level cacheing can be implemented
- * here.
+ * implementation.
  *
  * @author nermin.yehia
  */
@@ -37,6 +36,11 @@ public class LocalModel {
         return localModel;
     }
 
+    /***
+     * insert twitter users
+     * @param localUsers
+     * @return
+     */
     public boolean insertTwitterUsers(List<LocalUser> localUsers) {
         try {
             db.getUserDao().deleteBuilder().delete();
@@ -46,30 +50,21 @@ public class LocalModel {
             return true;
         } catch (SQLException e) {
 
-            Log.e("insertRole", "insertRole :" + e.getMessage());
+            Log.e("insertTwitterUsers", "insertTwitterUsers :" + e.getMessage());
             return false;
         }
     }
 
-    public boolean insertTwitterUser(LocalUser localUser) {
-        try {
-            db.getUserDao().createOrUpdate(localUser);
-
-            return true;
-        } catch (SQLException e) {
-
-            Log.e("insertRole", "insertRole :" + e.getMessage());
-            return false;
-        }
-    }
-
-
-    public List<LocalUser> findUsers(){
+    /***
+     * select twitter users from local database
+     * @return
+     */
+    public List<LocalUser> finfLocalUsers(){
         List<LocalUser> indicators = new ArrayList<>();
         try {
             indicators = db.getUserDao().queryForAll();
         } catch (SQLException e) {
-            Log.e("findLocalIndicators", "findLocalIndicators :" + e.getMessage());
+            Log.e("finfLocalUsers", "finfLocalUsers :" + e.getMessage());
         }
         return indicators;
     }

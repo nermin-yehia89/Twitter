@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">TwitterApp</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="app_name">Twitter App</string>
     <string name="preference_file_key">UserData</string>
     <string name="no_followers">No Followers... </string>
     <string name="no_tweets">No Tweets... </string>
@@ -10,6 +9,7 @@
     <string name="authentication_failed">Authentication Failed</string>
     <string name="authenticated_successfully">Authenticated Successfully</string>
     <string name="load_tweets_failed">Load Tweets Failed</string>
+    <string name="reload">Reload</string>
 
 
 </resources>

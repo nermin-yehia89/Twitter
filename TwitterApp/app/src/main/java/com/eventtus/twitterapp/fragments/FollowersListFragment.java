@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -162,7 +165,7 @@ public class FollowersListFragment extends BaseFragment implements
 
         @Override
         protected Void doInBackground(Void... params) {
-            followers = LocalModel.getInstance(activity).findUsers();
+            followers = LocalModel.getInstance(activity).finfLocalUsers();
             return null;
         }
     }
@@ -212,9 +215,25 @@ public class FollowersListFragment extends BaseFragment implements
             followersAdapter.notifyDataSetChanged();
 
             dismissProgressDialog();
-
-
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.reload : {
+                cursor = "-1";
+                showProgressDialog();
+                requestCurrentUserFollowers(cursor);
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.findItem(R.id.reload).setVisible(true);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 }

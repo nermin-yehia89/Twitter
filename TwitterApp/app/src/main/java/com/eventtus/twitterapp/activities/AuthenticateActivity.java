@@ -15,8 +15,11 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+/***
+ * Authentication activity
+ */
 public class AuthenticateActivity extends AppCompatActivity {
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+
     private TwitterLoginButton loginButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +31,6 @@ public class AuthenticateActivity extends AppCompatActivity {
             @Override
             public void success(Result<TwitterSession> result) {
                 // The TwitterSession is also available through:
-                // Twitter.getInstance().core.getSessionManager().getActiveSession()
                 TwitterSession session = result.data;
                 Toast.makeText(AuthenticateActivity.this,getResources().getString(R.string.authenticated_successfully),Toast.LENGTH_LONG).show();
                 TwitterAppUtils.saveToSharedPrefs(AuthenticateActivity.this, Extras.TWITTER_USER_ID,session.getUserId()+"");
@@ -38,7 +40,6 @@ public class AuthenticateActivity extends AppCompatActivity {
             }
             @Override
             public void failure(TwitterException exception) {
-
                 Log.d("TwitterKit", "Login with Twitter failure", exception);
                 Toast.makeText(AuthenticateActivity.this,getResources().getString(R.string.authentication_failed) + ": " + exception.getMessage(),Toast.LENGTH_LONG).show();
 

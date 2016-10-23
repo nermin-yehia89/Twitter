@@ -7,9 +7,9 @@ import android.content.Intent;
 import com.eventtus.twitterapp.Extras;
 import com.eventtus.twitterapp.MyTwitterApiClient;
 import com.eventtus.twitterapp.R;
-import com.eventtus.twitterapp.TwitterAppUtils;
 import com.eventtus.twitterapp.dataaccess.LocalModel;
 import com.eventtus.twitterapp.database.tables.LocalUser;
+import com.eventtus.twitterapp.models.Assembler;
 import com.eventtus.twitterapp.models.Followers;
 import com.eventtus.twitterapp.models.LocalUsers;
 import com.eventtus.twitterapp.models.Tweets;
@@ -29,7 +29,6 @@ import java.util.List;
 public class TwitterIntentService extends IntentService {
     private static final String TAG = TwitterIntentService.class.getName();
 
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     public static final String GET_TWEETS = "com.eventtus.twitterapp.services.action.getTweets";
     public static final String GOT_TWEETS = "com.eventtus.twitterapp.services.action.gotTweets";
     public static final String GET_FOLLOWERS = "com.eventtus.twitterapp.services.action.getFollowers";
@@ -43,7 +42,6 @@ public class TwitterIntentService extends IntentService {
         public static final String SHOW_ERROR_DIALOG = "com.gi.c2do.action.ShowError";
         public static final String PAGE = "com.gi.c2do.action.Page";
         public static final String CURSOR = "com.gi.c2do.action.Cursor";
-
 
     }
 
@@ -96,8 +94,9 @@ public class TwitterIntentService extends IntentService {
                     call.enqueue(new Callback<Followers>() {
                         @Override
                         public void success(Result<Followers> result) {
-                            List<LocalUser> users = TwitterAppUtils.assembleFollowers(result.data.users);
+                            List<LocalUser> users = Assembler.assembleFollowers(result.data.users);
                             LocalUsers localUsers = new LocalUsers(users);
+                            // save followers only for first page
                             if ("-1".equals(cursor) )
                                 saveFollwers(localUsers);
 
@@ -127,7 +126,7 @@ public class TwitterIntentService extends IntentService {
                 call.enqueue(new Callback<List<Tweet>>() {
                     @Override
                     public void success(Result<List<Tweet>> result) {
-                        List<com.eventtus.twitterapp.models.Tweet> tweets = TwitterAppUtils.assembleTweets(result.data);
+                        List<com.eventtus.twitterapp.models.Tweet> tweets = Assembler.assembleTweets(result.data);
                         Tweets allTweets = new Tweets(tweets);
 
                         // send broad cast to screen with data

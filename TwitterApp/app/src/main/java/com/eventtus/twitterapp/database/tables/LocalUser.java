@@ -44,13 +44,19 @@ public class LocalUser implements Serializable{
     private long userId;
 
     @DatabaseField(columnName = NAME)
-    String name;
+    private String name;
 
     @DatabaseField(columnName = SCREEN_NAME)
-    String screenName;
+    private String screenName;
 
     @DatabaseField(columnName = DESCRIPTION)
-    String description;
+    private String description;
+
+    @DatabaseField(columnName = PROFILE_IMAGE_URL)
+    private String profileImageUrl;
+
+    @DatabaseField(columnName = PROFILE_BG_IMAGE_URL)
+    private String profileBGImageUrl;
 
     public String getProfileImageUrl() {
         return profileImageUrl;
@@ -84,9 +90,6 @@ public class LocalUser implements Serializable{
         this.name = name;
     }
 
-    @DatabaseField(columnName = PROFILE_IMAGE_URL)
-    String profileImageUrl;
-
     public String getProfileBGImageUrl() {
         return profileBGImageUrl;
     }
@@ -95,6 +98,5 @@ public class LocalUser implements Serializable{
         this.profileBGImageUrl = profileBGImageUrl;
     }
 
-    @DatabaseField(columnName = PROFILE_BG_IMAGE_URL)
-    String profileBGImageUrl;
+
 }

@@ -5,12 +5,17 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import com.eventtus.twitterapp.Extras;
 import com.eventtus.twitterapp.R;
 import com.eventtus.twitterapp.TwitterAppUtils;
 import com.eventtus.twitterapp.fragments.FollowersListFragment;
 
+/***
+ * Main activity for authenticated user
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
@@ -18,17 +23,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         String userID = TwitterAppUtils.getFromSharedPrefs(this, Extras.TWITTER_USER_ID) ;
-
         if(savedInstanceState == null && userID != null )
             openFollowersFragment();
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
 

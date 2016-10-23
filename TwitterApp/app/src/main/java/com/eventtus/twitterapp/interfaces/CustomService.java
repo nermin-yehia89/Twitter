@@ -11,6 +11,7 @@ import retrofit2.http.Query;
 
 /**
  * Created by nermin.yehia on 10/18/2016.
+ * contains methods to call twitter api
  */
 
 public interface CustomService {

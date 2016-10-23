@@ -88,7 +88,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
 
             TableUtils.clearTable(getConnectionSource(), LocalUser.class);
-            ;
 
             Log.d(TAG, "Remove all DB");
             cleared = true;
